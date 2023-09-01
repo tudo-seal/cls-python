@@ -175,10 +175,11 @@ class FiniteCombinatoryLogic(Generic[C]):
         """Keep only productive grammar rules."""
 
         def is_ground(args: list[Type], ground_types: set[Type]) -> bool:
-            return all(True for arg in args if arg in ground_types)
+            x = all(arg in ground_types for arg in args)
+            return x
 
         ground_types: set[Type] = set()
-        new_ground_types, candidates = partition(
+        candidates, new_ground_types = partition(
             lambda ty: any(
                 True for (_, args) in memo[ty] if is_ground(args, ground_types)
             ),
@@ -187,7 +188,7 @@ class FiniteCombinatoryLogic(Generic[C]):
         # initialize inhabited (ground) types
         while new_ground_types:
             ground_types.update(new_ground_types)
-            new_ground_types, candidates = partition(
+            candidates, new_ground_types = partition(
                 lambda ty: any(
                     True for _, args in memo[ty] if is_ground(args, ground_types)
                 ),
