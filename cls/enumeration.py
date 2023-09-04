@@ -52,6 +52,9 @@ def enumerate_terms(
     from the start symbol ordered by (depth, term size).
     """
 
+    if start not in grammar:
+        return []
+
     # accumulator for previously seen terms
     result: set[Tree[T]] = set()
     terms: dict[S, set[Tree[T]]] = {n: set() for n in grammar.keys()}

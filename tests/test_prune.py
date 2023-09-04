@@ -47,8 +47,8 @@ class TestPrune(unittest.TestCase):
         self.assertEqual(0, len(self.enumerated_result))
 
     def test_grammar(self) -> None:
-        self.assertEqual(0, len(self.result[Constructor("a")]))
-        self.assertEqual(0, len(self.result[Constructor("b")]))
+        self.assertEqual(False, Constructor("a") in self.result)
+        self.assertEqual(False, Constructor("b") in self.result)
 
 
 if __name__ == "__main__":
