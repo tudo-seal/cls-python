@@ -1,6 +1,6 @@
 # Propositional Finite Combinatory Logic
 
-from collections import deque
+from collections import defaultdict, deque
 from collections.abc import Hashable, Iterable, Mapping, MutableMapping, Sequence
 from functools import reduce
 from typing import Callable, Generic, TypeAlias, TypeVar
@@ -91,61 +91,19 @@ class FiniteCombinatoryLogic(Generic[C]):
         )
         return maximal_elements(intersected_args, compare_args)
 
-    #    def _combine_arguments(
-    #        self,
-    #        positive_arguments: list[list[Type]],
-    #        negative_arguments: list[list[Type]],
-    #    ) -> list[list[Clause]]:
-    #        result: deque[list[deque[Type]]] = deque()
-    #        for pos in positive_arguments:
-    #            result.append(list(map(lambda ty: deque((ty,)), pos)))
-    #        for neg in negative_arguments:
-    #            new_result: deque[list[deque[Type]]] = deque()
-    #            for i in range(len(neg)):
-    #                for args in result:
-    #                    new_args = args.copy()
-    #                    new_args[i] = new_args[i].copy()
-    #                    new_args[i].append(neg[i])
-    #                    new_result.append(new_args)
-    #            result = new_result
-    #        return list(
-    #            list(map(FiniteCombinatoryLogic.list_of_types_to_clause, args))
-    #            for args in result
-    #        )
-    #
-    #    def boolean_to_clauses(self, target: BooleanTerm[Type]) -> list[Clause]:
-    #        dnf = minimal_dnf_as_list(target)
-    #
-    #        clauses: list[Clause] = []
-    #
-    #        for encoded_clause in dnf:
-    #            encoded_negatives, encoded_positives = partition(
-    #                lambda lit: lit[0], encoded_clause
-    #            )
-    #            positives = [lit[1] for lit in encoded_positives]
-    #            negatives = [lit[1] for lit in encoded_negatives]
-    #
-    #            positive_intersection = (
-    #                Omega() if len(positives) == 0 else reduce(Intersection, positives)
-    #            )
-    #
-    #            clauses.append((positive_intersection, frozenset(negatives)))
-    #
-    #        return clauses
-
     def inhabit(self, *targets: Type) -> TreeGrammar[C]:
         type_targets = deque(targets)
 
         # dictionary of type |-> sequence of combinatory expressions
-        memo: TreeGrammar[C] = dict()
+        memo: TreeGrammar[C] = defaultdict(deque)
+        seen: set[Type] = set()
 
         while type_targets:
             current_target = type_targets.pop()
-            if memo.get(current_target) is None:
-                # target type was not seen before
-                # paths: list[Type] = list(target.organized)
-                possibilities: deque[tuple[C, list[Type]]] = deque()
-                memo.update({current_target: possibilities})
+
+            # target type was not seen before
+            if current_target not in seen:
+                seen.add(current_target)
                 # If the target is omega, then the result is junk
                 if current_target.is_omega:
                     continue
@@ -162,7 +120,7 @@ class FiniteCombinatoryLogic(Generic[C]):
                             continue
 
                         for subquery in arguments:
-                            possibilities.append((combinator, subquery))
+                            memo[current_target].append((combinator, subquery))
                             type_targets.extendleft(subquery)
 
         # prune not inhabited types

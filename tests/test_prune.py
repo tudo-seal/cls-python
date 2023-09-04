@@ -18,7 +18,7 @@ class TestPrune(unittest.TestCase):
     logger = logging.getLogger(__name__)
     logging.basicConfig(
         format="%(module)s %(levelname)s: %(message)s",
-        level=logging.INFO,
+        # level=logging.INFO,
     )
 
     def setUp(self) -> None:
