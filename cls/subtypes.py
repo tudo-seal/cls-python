@@ -56,9 +56,9 @@ class Subtypes:
                     and self._check_subtype_rec(casted_r, r2)
                 )
             case Intersection(l, r):
-                return self._check_subtype_rec(subtypes, l) and self._check_subtype_rec(
-                    subtypes, r
-                )
+                return self._check_subtype_rec(
+                    subtypes.copy(), l
+                ) and self._check_subtype_rec(subtypes, r)
             case _:
                 raise TypeError(f"Unsupported type in check_subtype: {supertype}")
 
