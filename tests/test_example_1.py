@@ -18,7 +18,7 @@ class TestExample1(unittest.TestCase):
     logger = logging.getLogger(__name__)
     logging.basicConfig(
         format="%(module)s %(levelname)s: %(message)s",
-        # level=logging.INFO,
+        level=logging.INFO,
     )
 
     def test_example1(self) -> None:

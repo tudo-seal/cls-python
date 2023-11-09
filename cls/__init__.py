@@ -3,7 +3,7 @@ from collections.abc import Iterable, Mapping, MutableMapping
 from typing import Any, Optional, TypeVar
 
 from .subtypes import Subtypes
-from .types import Type, Omega, Constructor, Product, Arrow, Intersection
+from .types import Type, Omega, Constructor, Arrow, Intersection, Product
 from .enumeration import enumerate_terms, interpret_term, enumerate_terms_of_size
 from .fcl import FiniteCombinatoryLogic
 

@@ -35,13 +35,6 @@ class TestTypes(unittest.TestCase):
         self.assertEqual(a * b, Product(a, b))
         self.assertEqual(a * b * c, Product(Product(a, b), c))
 
-    def test_state(self) -> None:
-        s1 = Intersection(a, Arrow(b, c))
-        s2 = Intersection(c, Arrow(a, b))
-        x = s1.__getstate__()
-        s2.__setstate__(x)
-        self.assertEqual(s1, s2)
-
 
 if __name__ == "__main__":
     unittest.main()

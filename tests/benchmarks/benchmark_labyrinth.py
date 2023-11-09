@@ -4,10 +4,11 @@ import timeit
 from dataclasses import dataclass, field
 from typing import Any
 
+from cls.types import Product
+
 from cls import (
     Type,
     Constructor,
-    Product,
     Omega,
     Arrow,
     Intersection,
@@ -83,7 +84,7 @@ def move(SIZE: int, drow_from: int, dcol_from: int, drow_to: int, dcol_to: int) 
     )
 
 
-def main(SIZE: int = 10, output: bool = True) -> float:
+def main(SIZE: int = 20, output: bool = True) -> float:
     if output:
         for row in range(SIZE):
             for col in range(SIZE):

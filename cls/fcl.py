@@ -2,12 +2,11 @@
 
 from collections import defaultdict, deque
 from collections.abc import Hashable, Iterable, Mapping, MutableMapping, Sequence
-from functools import reduce
 from typing import Callable, Generic, TypeAlias, TypeVar
 
 from .combinatorics import maximal_elements, minimal_covers, partition
 from .subtypes import Subtypes
-from .types import Arrow, Intersection, Type
+from .types import _Arrow, Intersection, Type, _Type
 
 T = TypeVar("T", bound=Hashable, covariant=True)
 C = TypeVar("C")
@@ -49,13 +48,10 @@ class FiniteCombinatoryLogic(Generic[C]):
         """Presents a type as a list of 0-ary, 1-ary, ..., n-ary function types."""
 
         def unary_function_types(ty: Type) -> Iterable[tuple[Type, Type]]:
-            tys: deque[Type] = deque((ty,))
-            while tys:
-                match tys.pop():
-                    case Arrow(src, tgt) if not tgt.is_omega:
+            for t in ty:
+                match t:
+                    case _Arrow(src, tgt) if not tgt.is_omega:
                         yield (src, tgt)
-                    case Intersection(sigma, tau):
-                        tys.extend((sigma, tau))
 
         current: list[MultiArrow] = [([], ty)]
         while len(current) != 0:
@@ -67,28 +63,28 @@ class FiniteCombinatoryLogic(Generic[C]):
             ]
 
     def _subqueries(
-        self, nary_types: list[MultiArrow], paths: list[Type]
+        self, nary_types: list[MultiArrow], paths: Type
     ) -> Sequence[list[Type]]:
         # does the target of a multi-arrow contain a given type?
         target_contains: Callable[
-            [MultiArrow, Type], bool
-        ] = lambda m, t: self.subtypes.check_subtype(m[1], t)
+            [MultiArrow, _Type], bool
+        ] = lambda m, t: self.subtypes.check_subtype(m[1], Type((t,)))
         # cover target using targets of multi-arrows in nary_types
         covers = minimal_covers(nary_types, paths, target_contains)
+
         if len(covers) == 0:
             return []
-        # intersect corresponding arguments of multi-arrows in each cover
-        intersect_args: Callable[
-            [Iterable[Type], Iterable[Type]], list[Type]
-        ] = lambda args1, args2: [Intersection(a, b) for a, b in zip(args1, args2)]
 
-        intersected_args = (
-            list(reduce(intersect_args, (m[0] for m in ms))) for ms in covers
-        )
+        intersected_args = [
+            list(map(Intersection, *[multiarrow[0] for multiarrow in arity]))
+            for arity in covers
+        ]
+
         # consider only maximal argument vectors
         compare_args = lambda args1, args2: all(
             map(self.subtypes.check_subtype, args1, args2)
         )
+
         return maximal_elements(intersected_args, compare_args)
 
     def inhabit(self, *targets: Type) -> TreeGrammar[C]:
@@ -108,7 +104,7 @@ class FiniteCombinatoryLogic(Generic[C]):
                 if current_target.is_omega:
                     continue
 
-                paths: list[Type] = list(current_target.organized)
+                paths: Type = current_target.organized
 
                 # try each combinator and arity
                 for combinator, combinator_type in self.repository.items():

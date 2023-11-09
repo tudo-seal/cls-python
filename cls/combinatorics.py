@@ -51,7 +51,7 @@ def maximal_elements(
 
 
 def minimal_covers(
-    sets: list[S], to_cover: list[E], contains: Callable[[S, E], bool]
+    sets: list[S], to_cover: Iterable[E], contains: Callable[[S, E], bool]
 ) -> list[list[S]]:
     """List minimal covers of elements in to_cover using given sets.
 
@@ -64,8 +64,8 @@ def minimal_covers(
     necessary_sets: set[int] = set()
     # for each element e: sets containing e
     relevant_sets: deque[set[int]] = deque()
-    for i in range(len(to_cover)):
-        covering_sets = {j for j in range(len(sets)) if contains(sets[j], to_cover[i])}
+    for c in to_cover:
+        covering_sets = {j for j in range(len(sets)) if contains(sets[j], c)}
         if len(covering_sets) == 0:  # at least one element cannot be covered
             return []
         elif len(covering_sets) == 1:  # exactly one set is relevant
