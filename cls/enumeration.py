@@ -115,6 +115,8 @@ def enumerate_terms_iter(
                 if tree_size(i) <= generation:
                     already_checked[n].add(hash(i))
                     old_terms[n].append(i)
+                else:
+                    repeat = True
 
 
 def enumerate_terms_old(
