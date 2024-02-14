@@ -49,7 +49,7 @@ class TestList(unittest.TestCase):
     )
 
     def setUp(self) -> None:
-        self.results = list(inhabit_and_interpret(exampleRepo, List(B)))
+        self.results = list(inhabit_and_interpret(exampleRepo, List(B), max_count=100))
         for z in self.results:
             self.logger.info(z)
 
@@ -63,7 +63,7 @@ class TestList(unittest.TestCase):
             max_len = len(z)
 
     def test_all_lists(self) -> None:
-        for z in self.results:
+        for z in self.results[:100]:
             self.assertIsInstance(z, list)
 
 

@@ -4,7 +4,12 @@ from typing import Any, Optional, TypeVar
 
 from .subtypes import Subtypes
 from .types import Type, Omega, Constructor, Product, Arrow, Intersection
-from .enumeration import enumerate_terms, interpret_term, enumerate_terms_of_size
+from .enumeration import (
+    interpret_term,
+    enumerate_terms,
+    enumerate_terms_iter,
+    enumerate_terms_of_size,
+)
 from .fcl import FiniteCombinatoryLogic
 
 __all__ = [
@@ -16,6 +21,7 @@ __all__ = [
     "Arrow",
     "Intersection",
     "enumerate_terms",
+    "enumerate_terms_iter",
     "enumerate_terms_of_size",
     "interpret_term",
     "FiniteCombinatoryLogic",
@@ -28,12 +34,10 @@ C = TypeVar("C")
 def inhabit_and_interpret(
     repository: Mapping[C, Type],
     query: list[Type] | Type,
-    max_count: Optional[int] = 100,
+    max_count: Optional[int] = None,
     subtypes: Optional[Subtypes] = None,
 ) -> Iterable[Any]:
-    fcl = FiniteCombinatoryLogic(
-        repository, Subtypes(dict()) if subtypes is None else subtypes
-    )
+    fcl = FiniteCombinatoryLogic(repository, Subtypes(dict()) if subtypes is None else subtypes)
 
     if not isinstance(query, list):
         query = [query]
@@ -44,8 +48,6 @@ def inhabit_and_interpret(
     ] = fcl.inhabit(*query)
 
     for q in query:
-        enumerated_terms = enumerate_terms(
-            start=q, grammar=grammar, max_count=max_count
-        )
+        enumerated_terms = enumerate_terms(start=q, grammar=grammar, max_count=max_count)
         for term in enumerated_terms:
             yield interpret_term(term)
